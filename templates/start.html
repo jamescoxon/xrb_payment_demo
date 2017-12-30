@@ -1,0 +1,19 @@
+<!doctype html>
+<title>RaiBlocks Demo</title>
+<h1>RaiBlocks Payment/Checkout Demo</h1>
+<p>Welcome to a demo of a RaiBlocks based payment checkout system. The current demo is functional, it works using a backend of Python3/Flask with POST requests and a websocket setup to give real time requests. Currently it is set to use 'xrb' which is the smallest usable denomination of RaiBlocks</p>
+<p><b>What it does:</b> The user completes the order form, adds their details, the server combines the total amount to be paid with a transaction id into a unique identifier (using <a href='http://hashids.org/'>hashids</a>). They are then directed to another dynamically generated page where they are presented with a new xrb address to which they send the payment. This page dynamically updates using websockets and when the payment is received will show this. The transaction is then closed and the details are emailed to the merchant.</p>
+<p><b>What it doesn't do</b>: This is only a simple proof of concept demo, there is <b>zero</b> security right now and it doesn't keep track particularly well of orders. It also doesn't yet email the merchant.
+<p><b>What next</b>: I'm hoping that the amazing RaiBlocks community will take this and make it into a functioning service for merchants.</p>
+
+<h2>Checkout</h2>
+<p>As this is a demo ignore the Name, Address and Email fields but add an amount (i.e. 1) and a transaction ID (random number (i.e. 235332)</p>
+<p><b>Please be aware that the demo won't return your 1xrb - sorry! its a tiny amount</b></p>
+<form action="/gen_hash" method="POST">
+Name  <input type="text" name="name" size="64"><br/><br/>
+Address<input type="text" name="address" size="64"><br/><br/>
+Email Address <input type="text" name="email" size="64"><br/><br/>
+Amount (in xrb, not XRB) <input type="text" name="amount" size="64"><br/><br/>
+Transaction ID (put a random number in here) <input type="text" name="transaction_id" size="64"><br/><br/>
+<input type="submit" value="Submit">
+</form>

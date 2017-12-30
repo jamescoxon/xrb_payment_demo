@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>RaiBlocks Demo</title>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            namespace = '/test';
+
+            // Connect to the Socket.IO server.
+            // The connection URL has the following format:
+            //     http[s]://<domain>:<port>[/<namespace>]
+            var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
+            // Event handler for new connections.
+            // The callback function is invoked when a connection with the
+            // server is established.
+            socket.on('connect', function() {
+                //socket.emit('my_event', {data: 'I\'m connected!'});
+            });
+
+            var ping_pong_times = [];
+            var start_time;
+            var getBalanceVar = setInterval(function(){ get_balance() }, 5000);
+            function get_balance() {
+                start_time = (new Date).getTime();
+                socket.emit('poll_balance', {data : '{{ hash }}' });
+            }
+
+	    function stop_balance() {
+		clearInterval(getBalanceVar);
+	    }
+
+            // Event handler for server sent data.
+            // The callback function is invoked whenever the server emits data
+            // to the client. The data is then displayed in the "Received"
+            // section of the page.
+            socket.on('balance', function(msg) {
+		var new_balance = parseInt(msg.data);
+		var target_balance = parseInt('{{ amount }}')
+		if (new_balance >= target_balance) {
+	                $('#balance').text(new_balance + 'xrb - Payment Received, Thanks').html();
+			stop_balance();
+		} else {
+                	$('#balance').text('<p>Awaiting Payment, currently paid: ' + msg.data + ' of ' + target_balance + 'xrb</p><p>You can now close this page as the transaction is complete</p>').html();
+		}
+            });
+
+            $('form#disconnect').submit(function(event) {
+                socket.emit('disconnect_request');
+                return false;
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>RaiBlocks Payment/Checkout Demo</h1>
+    <p>We've now passed the hashid to the payment system, this page is now polling the balance (pending+balance) and when the balance >= amount will change to 'Payment Received' and the websocket will disconnect. At this point the system would email the merchant with all the transaction details</p>
+
+    <p>Send {{ amount }} xrb to {{ xrb_address }}</p>
+    <p><b>Current Status:</b></p>
+    <div id="balance"></div>
+
+    <p>Once the transaction is complete the system can forward the funds to the merchants account</p>
+
+</body>
+</html>
